@@ -7,7 +7,7 @@ Detta är ett personligt portföljprojekt som undersöker frågan med modern
 tidsserietestning: rolling-origin-backtesting, fyra modellfamiljer och en
 redundant öppen datakedja (Skogsstyrelsen + SMHI) som uppdateras med ett kommando.
 
-🔗 **Live-dashboard:** körs på Streamlit Cloud — länk läggs in här vid publicering.
+🔗 **Live-dashboard:** [forest-supply-forecast.streamlit.app](https://forest-supply-forecast.streamlit.app/)
 
 **Om namnet:** "supply" syftar på användningsområdet — prognosen är en *ledande
 indikator* för kommande råvarutillförsel (anmälan föregår avverkning, som blir
