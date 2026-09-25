@@ -143,8 +143,14 @@ def example_cases(df: pd.DataFrame, wide: pd.DataFrame) -> list[str]:
                                ("seasonal_naive", COLORS["neutral"], ":")):
             r = model_row[model_row["model"] == mdl].sort_values("timestamp")
             if len(r):
-                ax.plot(pd.to_datetime(r["timestamp"]), r["prediction"], color=color, ls=ls,
-                        lw=1.4, label=PRETTY.get(mdl, mdl))
+                # linje från sista historikpunkten till prognospunkten + markör,
+                # annars ritar matplotlib ingenting för en ensam punkt
+                xs = [hist.index[-1], *pd.to_datetime(r["timestamp"])]
+                ys = [hist.values[-1], *r["prediction"].values]
+                ax.plot(xs, ys, color=color, ls=ls, lw=1.8, marker="o", ms=3.5,
+                        label=PRETTY.get(mdl, mdl))
+        # zooma in sista året + prognosperioden så att prognoslinjerna syns tydligt
+        ax.set_xlim(hist.index[-12], pd.Timestamp(origin) + pd.DateOffset(months=3))
         ax.set_title(f"{title}\n{region}, origin {origin:%Y-%m}", fontsize=8.5)
         ax.set_ylabel("ha/månad")
         ax.tick_params(axis="x", rotation=45, labelsize=6.5)

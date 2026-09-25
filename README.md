@@ -15,8 +15,6 @@ virkesvolym). Målvariabeln är areal (ha), inte virkesvolym (m³fub); appen erb
 därför en **indikativ volymvy** där prognosbandet omvandlas med landsdelens
 genomsnittliga slutavverkningsfaktor (m³sk/ha, Skogsstyrelsen JO0312_06).
 
-> **Avgränsning:** projektet använder offentlig proxy-data och är **inte** ett
-> Södra-projekt; resultaten säger inget om Södras interna data eller prognosprecision.
 
 ![Target](outputs/figures/fig_target_national.png)
 
@@ -27,9 +25,10 @@ kapacitet i sågverk/fabriker, logistik och prissättning vilar på uppskattning
 av framtida avverkningsvolym. Offentlig statistik om **avverkningsanmälningar**
 (Skogsstyrelsen) publiceras månadsvis och är en tidig, oberoende proxy för
 kommande råvaruaktivitet. Frågan är om den är prognostiserbar — och om en
-foundation-modell för tidsserier (Google TimesFM 3, zero-shot) slår enklare
-alternativ. Specifikationen var metodöppen: baselines är likvärdiga kandidater,
-och ett utfall där TimesFM *förlorar* är lika intressant.
+foundation-modell för tidsserier (Google TimesFM 3, zero-shot) slår de klassiska
+alternativen, från enkla baselines (Naive, Seasonal Naive) till gradient
+boosting (XGBoost). Specifikationen var metodöppen: baselines är likvärdiga
+kandidater, och ett utfall där TimesFM *förlorar* är lika intressant.
 
 ## Data (allt öppet, hämtat via API, reproducerbart)
 
@@ -44,9 +43,14 @@ Detaljerad källkritik, API-särdrag och stationstäckning: [docs/data_inventory
 ## Metod
 
 - **Terminologi:** målvariabeln är *anmäld* areal — en **proxy**, inte faktisk avverkning.
-- **Utvärdering:** rolling-origin-backtesting, en startpunkt per månad 2022M09–2026M08
-  (48 startpunkter), alla 26 serier, horisonterna 1/3/6 månader ⇒ **ca 35 000 prognosvärden**.
-  Vid varje startpunkt ser modellen endast data ≤ startpunkten (hårt läckagetest i testsviten).
+- **Utvärdering:** rolling-origin-backtesting — modellen gör om en prognos vid varje
+  månadsstart ("startpunkt") och jämförs mot utfallet när det kommit in. Här: 48
+  startpunkter (en per månad 2022M09–2026M08) × 26 serier (21 län + 4 landsdelar +
+  Hela landet) × horisonterna 1/3/6 månader. Det ger ca 3 500 utvärderade prognoser
+  per modell, **ca 35 000 totalt över de tio modellvarianterna** (de sista
+  startpunkterna är inte utvärderbara på alla horisonter, eftersom deras utfall
+  ännu inte hunnit in). Vid varje startpunkt ser modellen endast data ≤ startpunkten
+  (hårt läckagetest i testsviten).
 - **Modeller:** Naive, Seasonal Naive (m=12), XGBoost (direkt prognos för flera
   horisonter; förskjutna värden 1/2/3/6/12, rullande medel/std, kalender; omträning
   vid varje startpunkt) och **Google TimesFM 3.0** (330M, zero-shot, MLX-backend
@@ -79,16 +83,22 @@ Huvudfynd:
    och ca 25–30 % bättre än Seasonal Naive vid 1 mån. Zero-shot, utan träning på
    svensk skogsdata.
 2. **Multivariat korsserieinformation hjälper måttligt på länsnivå**
-   (MASE 0,61/0,72/0,77) men ger i praktiken ingen förbättring på toppserierna.
+   (MASE 0,61/0,72/0,77) men ger i praktiken ingen förbättring på toppserierna
+   (de fem aggregerade serierna: Hela landet + de fyra landsdelarna).
 3. **Väder- och pris-kovariater tillför praktiskt taget inget** — marginellt
    *sämre* för TimesFM. Kalender är den enda kovariat som förbättrar resultaten
    (praktiskt taget gratis: modellen ser redan månadsrytmen i sin kontext).
-4. **Baselines vinner vid regimskiften:** Seasonal Naive är starkast vid flera
-   svåra startpunkter (t.ex. startpunkt 2025-06: MAE 1 946 ha mot TimesFMs 6 376) —
-   när nivån skiftar men säsongsmönstret håller vinner naiv säsongsupprepning.
-5. **Prognosintervall (P10–P90):** täckning ca 79 % vid 1 mån (nominellt 80 %) men
-   ca 60 % vid 6 mån — intervallet är för smalt på längre horisonter; kalibrering
-   krävs före beslutsanvändning.
+4. **Baselines vinner vid regimskiften** (plötsliga nivåskiften i serien där
+   säsongsmönstret i sig är oförändrat): Seasonal Naive är starkast vid flera
+   svåra startpunkter (t.ex. startpunkt 2025-06: MAE 1 946 ha mot TimesFMs 6 376).
+   När aktivitetsnivån hoppar men den årliga säsongsvågen ser likadan ut vinner
+   naiv säsongsupprepning — den kopierar fjolårets form, som fortfarande stämmer,
+   medan de tränade modellerna halkar efter det nya nivåläget.
+5. **Prognosintervall (P10–P90):** intervallet mellan 10- och 90-percentilerna
+   bör innehålla utfallet 80 % av gångerna. I backtesting stämmer det vid 1 mån
+   (täckning ca 79 %), men vid 6 mån hamnar bara ca 60 % av utfallen i bandet —
+   modellen är för självsäker på långa horisonter och intervallen behöver
+   kalibreras (breddas) före beslutsanvändning.
 
 Fullständiga tabeller per region/horisont: [outputs/results/](outputs/results/),
 resultatrapport: [docs/experiments_results.md](docs/experiments_results.md).
@@ -99,8 +109,10 @@ resultatrapport: [docs/experiments_results.md](docs/experiments_results.md).
   modeller som missar säsongens *timing* tar stryk ([docs/error_analysis.md](docs/error_analysis.md)).
 - Svagaste serier för TimesFM: volatila småregioner (Gävleborg, Dalarna) där
   enskilda stora avverkningar dominerar månadsbilden.
-- Konkreta fall (TimesFM vinner / XGBoost vinner / Seasonal Naive vinner)
-  visualiseras i figuren nedan.
+- Tre konkreta prognosfall för hela landet (vid 3 månaders horisont) visualiseras
+  i figuren nedan — ett fall där TimesFM var bäst, ett där XGBoost var bäst och
+  ett där Seasonal Naive var bäst. Att alla tre kan vinna på enskilda tillfällen
+  är just därför medelvärdet över alla 26 serier är huvudmåttet.
 
 ![Exempel](outputs/figures/fig_error_examples.png)
 
@@ -109,16 +121,18 @@ resultatrapport: [docs/experiments_results.md](docs/experiments_results.md).
 Prognoser med denna metodik kan vara beslutsstöd för:
 
 - **Råvaruplanering:** 3–6-månadersprognoser per landsdel ger en tidig indikation
-  om avverkningsaktiviteten förväntas stiga eller falla inför inköps- och
+  på om avverkningsaktiviteten förväntas stiga eller falla inför inköps- och
   produktionsplanering.
 - **Leveranskedja och kapacitet:** prognosbanden (P10–P90) kan användas för
   scenarioplanering av transport- och beredningskapacitet.
 - **Inköpsstrategi:** förväntad aktivitetsnivå påverkar prisförhandlingar och
   upphandlingsfrekvens.
 
-Viktiga reservat: målvariabeln är anmälningar (inte leveranser), regionaliteten är
-län/landsdel (inte Södras medlems- eller leveransgeografi), och en produktiv
-vidareutveckling vore Södras interna data + kalibrerade intervall + lokala kovariater.
+Viktiga förbehåll: målvariabeln är anmälda avverkningar (inte faktiska
+leveranser), upplösningen är län/landsdel (inte ett enskilt företags medlems-
+eller leveransgeografi), och en naturlig vidareutveckling vore att koppla in
+intern företagsdata (t.ex. faktiska avverkningar per leverantör), kalibrera
+intervallen och lägga till lokala kovariater.
 
 ## Begränsningar
 
