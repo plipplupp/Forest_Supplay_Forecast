@@ -1,0 +1,31 @@
+modell,horizon,MAE,MASE,sMAPE
+Naive,1,268.96,0.81,28.02
+Naive,3,370.79,1.06,34.34
+Naive,6,406.06,1.14,37.04
+Seasonal Naive,1,289.0,0.92,31.43
+Seasonal Naive,3,294.21,0.93,32.15
+Seasonal Naive,6,295.71,0.94,32.41
+TimesFM A (univariat),1,203.77,0.63,21.93
+TimesFM A (univariat),3,243.92,0.74,25.61
+TimesFM A (univariat),6,255.26,0.79,27.88
+TimesFM B (multivariat län),1,198.66,0.61,21.46
+TimesFM B (multivariat län),3,240.22,0.72,25.12
+TimesFM B (multivariat län),6,251.24,0.77,27.3
+TimesFM C (+kalender),1,200.52,0.62,21.64
+TimesFM C (+kalender),3,243.69,0.73,25.47
+TimesFM C (+kalender),6,255.36,0.79,27.63
+TimesFM D (+väder),1,207.18,0.63,21.89
+TimesFM D (+väder),3,247.17,0.74,25.6
+TimesFM D (+väder),6,258.28,0.79,27.79
+TimesFM E (+priser),1,207.6,0.63,21.93
+TimesFM E (+priser),3,246.7,0.74,25.6
+TimesFM E (+priser),6,258.24,0.8,27.94
+XGBoost (bas),1,241.73,0.75,25.9
+XGBoost (bas),3,289.46,0.9,30.38
+XGBoost (bas),6,288.61,0.94,31.87
+XGBoost + väder,1,237.63,0.75,26.01
+XGBoost + väder,3,286.17,0.9,30.22
+XGBoost + väder,6,290.17,0.95,31.82
+XGBoost + väder+pris,1,238.63,0.74,25.6
+XGBoost + väder+pris,3,284.89,0.87,29.67
+XGBoost + väder+pris,6,285.5,0.9,30.85

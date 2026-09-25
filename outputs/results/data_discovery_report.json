@@ -1,0 +1,120 @@
+{
+  "genererad": "2026-09-17T11:59:08+00:00",
+  "syfte": "Verifiering av datakallor for forest-supply-forecast (Phase 1)",
+  "skogsstyrelsen": {
+    "databaser": [
+      "Skogsstyrelsens statistikdatabas",
+      "Skogsstyrelsens statistikdatabas D"
+    ],
+    "target": {
+      "title": "05. Areal anmälan om avverkning och ansökan om tillstånd till avverkning efter Region, År och Månad",
+      "regioner": 26,
+      "lan": 21,
+      "ar": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19"
+      ],
+      "updated": "None",
+      "sond": {
+        "status": 200,
+        "n_rader": 240,
+        "forsta": {
+          "key": [
+            "0",
+            "0",
+            "0"
+          ],
+          "value": "22916"
+        },
+        "sista": {
+          "key": [
+            "0",
+            "19",
+            "11"
+          ],
+          "value": ".."
+        },
+        "not_isanlighet": "'..' ar saknat/framtida varde"
+      }
+    },
+    "priser": {
+      "title": "3. Avräkningspriser, volymvägda genomsnitt (kr/m3f ub) för leveransvirke efter Landsdel, Sortiment och Kvartal",
+      "dimensioner": {
+        "Landsdel": 5,
+        "Sortiment": 6,
+        "Kvartal": 30
+      }
+    },
+    "lager": {
+      "title": "2. Lager efter Virkesbalansområde, Virkesråvara, 1 000 m3f ub och Kvartalsslut",
+      "dimensioner": {
+        "Virkesbalansområde": 5,
+        "Virkesråvara, 1 000 m3f ub": 4,
+        "Kvartalsslut": 54
+      }
+    }
+  },
+  "smhi": {
+    "parametrar": {
+      "22": {
+        "label": "Lufttemperatur, medel per manad",
+        "unit": "celsius",
+        "antal_stationer": 975,
+        "tacker_2007_2026": 205
+      },
+      "23": {
+        "label": "Nederbordsmangd, summa per manad",
+        "unit": "millimeter",
+        "antal_stationer": 2169,
+        "tacker_2007_2026": 480
+      },
+      "2": {
+        "label": "Lufttemperatur, medel per dygn",
+        "unit": "celsius",
+        "antal_stationer": 941,
+        "tacker_2007_2026": 206
+      },
+      "5": {
+        "label": "Nederbordsmangd, summa per dygn",
+        "unit": "millimeter",
+        "antal_stationer": 2182,
+        "tacker_2007_2026": 482
+      },
+      "8": {
+        "label": "Snodjup per dygn",
+        "unit": "meter",
+        "antal_stationer": 1897,
+        "tacker_2007_2026": 371
+      }
+    },
+    "provhamtning": {
+      "station": "188790 (Abisko Aut)",
+      "perioder": [
+        "latest-months",
+        "corrected-archive"
+      ],
+      "csv_status": 200,
+      "csv_rader": 239,
+      "forsta_datarad": "﻿Stationsnamn;Stationsnummer;Stationsnät;Mäthöjd (meter över marken)",
+      "sista_datarad": "2026-05-01 00:00:01;2026-06-01 00:00:00;2026-05;5.2;Y"
+    }
+  }
+}

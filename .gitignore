@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Rådata hämtas reproducerbart via scripts (för stor för repot: ~89 MB)
+data/raw/*
+data/external/*
+!data/raw/.gitkeep
+!data/external/.gitkeep
+
+# Väderdata på stationsnivå behövs inte av appen och hämtas via transform-steget
+data/processed/weather_stations.parquet
+
+# Modellvikter/cache
+*.pt
+*.ckpt
+.cache/
+
+# OS/editor
+.DS_Store
+.env
+.vscode/
+.idea/
